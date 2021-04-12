@@ -1,13 +1,16 @@
 import mongoose, {Document, Schema} from 'mongoose'
 
-interface SchemaPost extends Document {
-    postedBy: string;
-    comments: string;
-    likes: string;
-    createdAt: Date;
+import { IschemaUser } from '../user/user'
+
+export interface SchemaPost extends Document {
+    content: string;
+    postedBy: IschemaUser[]
+    comments: IschemaUser[]
+    likes: IschemaUser[]
 }
 
 const postSchema: Schema = new mongoose.Schema({
+    content: String,
     postedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -23,10 +26,9 @@ const postSchema: Schema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
         }
-    ],
-    createdAt: new Date()
+    ]
 })
 
-const Post = mongoose.model<SchemaPost>(`Post`, postSchema)
+const Post = mongoose.model<SchemaPost>('Post', postSchema)
 
 export default Post

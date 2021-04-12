@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { compare } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
+import session from 'cookie-session'
 import createError from 'http-errors'
 
 // Models
@@ -22,7 +23,8 @@ export const loginUser: RequestHandler = async (req, res, next) => {
 
                 const token = sign({id: foundUser._id}, process.env.JWT_KEY as string)
 
-                res.status(200).json({
+                req.session!.userID = foundUser._id
+                return res.status(200).json({
                     status: res.statusCode = 200,
                     loggedInUser: foundUser,
                     token

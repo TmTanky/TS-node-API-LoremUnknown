@@ -1,6 +1,7 @@
 require('dotenv').config()
 import express, { Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
+import cookieSession from 'cookie-session'
 import createError from 'http-errors'
 
 const app = express()
@@ -9,14 +10,24 @@ const PORT = process.env.PORT || 3000
 // Routes
 import RegisterRouter from './routes/register/register'
 import LoginRouter from './routes/login/login'
+import CreatePostRouter from './routes/post/createPost/createPost'
+import DeletePostRouter from './routes/post/deletePost/deletePost'
+import UpdatePostRouter from './routes/post/updatePost/updatePost'
 
-mongoose.connect(`mongodb+srv://TmAdmin:${process.env.MONGO_PASS}@cluster0.c7khy.mongodb.net/TS-api-unknownlorem?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
+mongoose.connect(`mongodb+srv://TmAdmin:${process.env.MONGO_PASS}@cluster0.c7khy.mongodb.net/TS-api-unknownlorem?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false })
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+app.use(cookieSession({
+    name: 'session',
+    keys: [process.env.KEY_1 as string, process.env.KEY_2 as string]
+}))
 
 app.use(RegisterRouter)
 app.use(LoginRouter)
+app.use(CreatePostRouter)
+app.use(DeletePostRouter)
+app.use(UpdatePostRouter)
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     next(createError(404, `Not found`))
