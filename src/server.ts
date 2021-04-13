@@ -1,5 +1,5 @@
 require('dotenv').config()
-import express, { Request, Response, NextFunction } from 'express'
+import express, { Request, Response, NextFunction, RequestHandler } from 'express'
 import mongoose from 'mongoose'
 import cookieSession from 'cookie-session'
 import createError from 'http-errors'
@@ -13,6 +13,10 @@ import LoginRouter from './routes/login/login'
 import CreatePostRouter from './routes/post/createPost/createPost'
 import DeletePostRouter from './routes/post/deletePost/deletePost'
 import UpdatePostRouter from './routes/post/updatePost/updatePost'
+import ReactsPostRouter from './routes/post/reactsPost/reactsPost'
+import CommentsRouter from './routes/post/commentPost/commentPost'
+import DeleteCommentRouter from './routes/post/commentPost/deleteCommentPost'
+import UpdateCommentRouter from './routes/post/commentPost/updateCommenPost'
 
 mongoose.connect(`mongodb+srv://TmAdmin:${process.env.MONGO_PASS}@cluster0.c7khy.mongodb.net/TS-api-unknownlorem?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false })
 
@@ -28,6 +32,10 @@ app.use(LoginRouter)
 app.use(CreatePostRouter)
 app.use(DeletePostRouter)
 app.use(UpdatePostRouter)
+app.use(ReactsPostRouter)
+app.use(CommentsRouter)
+app.use(DeleteCommentRouter)
+app.use(UpdateCommentRouter)
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     next(createError(404, `Not found`))
