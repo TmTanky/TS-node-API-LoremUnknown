@@ -14,8 +14,12 @@ export const registerUser: RequestHandler = async (req, res, next) => {
 
     try {
 
-        if (password.length <= 5) {
-            return next(createError(400, 'Password must be 8 or more characters long'))
+        if (firstName === "" || lastName === "" || username === "" || email === "" || password === "") {
+            return next(createError(400, "Inputs can't be empty."))
+        } 
+
+        if (password.length < 5) {
+            return next(createError(400, 'Password must be 5 or more characters long'))
         }
 
         const existingEmail: IschemaUser | null = await User.findOne({email})
@@ -39,7 +43,6 @@ export const registerUser: RequestHandler = async (req, res, next) => {
         const token = sign({id: createUser._id }, process.env.JWT_KEY as string)
 
         return res.status(200).json({
-            status: res.statusCode = 200,
             createdUser: createUser,
             token
         })

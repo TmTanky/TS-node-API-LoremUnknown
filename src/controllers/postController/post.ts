@@ -7,12 +7,30 @@ import User, {IschemaUser} from '../../models/user/user'
 import Post, {SchemaPost} from '../../models/post/post'
 import Comment, {Icomment} from '../../models/comment/comment'
 
+export const getAllPost: RequestHandler = async (req, res ,next) => {
+
+    try {
+
+        const allPost: SchemaPost[] = await Post.find({}).populate('postedBy')
+
+        res.status(200).json({
+            status: res.status,
+            data: allPost
+        })
+        
+    } catch (err) {
+        next(createError(400, 'Please try again'))
+    }
+
+}
+
 export const createPost: RequestHandler = async (req, res, next) => {
 
     try {
 
-        const userID: IschemaUser = req.session!.userID
-        const { content } = req.body as {content: string}
+        const userID = req.params.userID
+        const { content, isHidden } = req.body.createPost as {content: string, isHidden: boolean}
+        console.log(req.body.createPost)
 
         if (!content || content === "") {
             return next(createError(400, "Content cannot be empty."))
@@ -20,8 +38,9 @@ export const createPost: RequestHandler = async (req, res, next) => {
 
         const newPostByUser = new Post({
             content,
-            postedBy: userID
-        }).populate('posts')
+            postedBy: userID,
+            isHidden
+        }).populate('postedBy')
 
         await newPostByUser.save()
 

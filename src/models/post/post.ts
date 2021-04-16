@@ -4,9 +4,10 @@ import { IschemaUser } from '../user/user'
 
 export interface SchemaPost extends Document {
     content: string;
-    postedBy: IschemaUser[]
-    comments: IschemaUser[]
-    likes: IschemaUser[]
+    postedBy: IschemaUser[];
+    comments: IschemaUser[];
+    likes: IschemaUser[];
+    isHidden: boolean
 }
 
 const postSchema: Schema = new mongoose.Schema({
@@ -18,7 +19,7 @@ const postSchema: Schema = new mongoose.Schema({
     comments: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'Comment'
         }
     ],
     likes: [
@@ -26,7 +27,8 @@ const postSchema: Schema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
         }
-    ]
+    ],
+    isHidden: Boolean
 })
 
 const Post = mongoose.model<SchemaPost>('Post', postSchema)

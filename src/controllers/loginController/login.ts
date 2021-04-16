@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express'
+import e, { RequestHandler } from 'express'
 import { compare } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import session from 'cookie-session'
@@ -12,8 +12,11 @@ export const loginUser: RequestHandler = async (req, res, next) => {
     try {
 
         const {email, password} = req.body as {email: string, password: string}
-
         const foundUser: IschemaUser | null = await User.findOne({email})
+
+        if (email === "" || password === "") {
+            return next(createError(400, `Inputs can't be empty.`))
+        }
 
         if (foundUser) {
 
@@ -24,11 +27,13 @@ export const loginUser: RequestHandler = async (req, res, next) => {
                 const token = sign({id: foundUser._id}, process.env.JWT_KEY as string)
 
                 req.session!.userID = foundUser._id
+                console.log(req.session!.userID = foundUser._id)
                 return res.status(200).json({
-                    status: res.statusCode = 200,
+                    status: 200,
                     loggedInUser: foundUser,
                     token
                 })
+
             } else {
                 next(createError(400, 'Invalid Email or Password.'))
             }
@@ -38,7 +43,11 @@ export const loginUser: RequestHandler = async (req, res, next) => {
         }
         
     } catch (err) {
-        next(createError(400, 'Please try again.'))
+        next(createError(500, 'Please try again.'))
     }
 
+}
+
+export const logoutUser: RequestHandler = (req, res, next) => {
+    req.session = null
 }
