@@ -30,7 +30,6 @@ export const createPost: RequestHandler = async (req, res, next) => {
 
         const userID = req.params.userID
         const { content, isHidden } = req.body.createPost as {content: string, isHidden: boolean}
-        console.log(req.body.createPost)
 
         if (!content || content === "") {
             return next(createError(400, "Content cannot be empty."))
@@ -133,18 +132,25 @@ export const likedPost: RequestHandler = async (req, res, next) => {
     try {
 
         const postID = req.params.postID
-        const userID: IschemaUser = req.session!.userID
+        const user: IschemaUser = req.body
 
         if (!isValidObjectId(postID)) {
             return next(createError(400, "Please input valid postID"))
         }
 
-        const ifFound = await Post.findOne({_id: postID})
-
-        if (ifFound) {
+        const foundDoc = await Post.findOne({_id: postID})
+        const isAlreadyLiked = foundDoc?.likes.includes(user._id)
+        
+        if (isAlreadyLiked) {
+            await Post.findOneAndUpdate({_id: postID}, {
+                $pull: {
+                    likes: user._id
+                }
+            })
+        } else {
             await Post.findOneAndUpdate({_id: postID}, {
                 $addToSet: {
-                    likes: userID
+                    likes: user._id
                 }
             })
     
@@ -152,8 +158,6 @@ export const likedPost: RequestHandler = async (req, res, next) => {
                 status: res.status,
                 msg: "You liked this post."
             })
-        } else {
-            return next(createError(400, "No post found"))
         }
         
     } catch (err) {
@@ -200,11 +204,11 @@ export const commentInPost: RequestHandler = async (req, res, next) => {
 
     try {
 
-        const {comment} = req.body as {comment: string}
+        const user = req.body as {user: IschemaUser}
+        const {comment} = req.body as {comment: {current: string}}
         const postID = req.params.postID
-        const userID: IschemaUser = req.session!.userID
 
-        if (!comment || comment === "") {
+        if (!comment.current || comment.current === "") {
             return next(createError(400, "Comment can't be empty."))
         }
 
@@ -213,8 +217,8 @@ export const commentInPost: RequestHandler = async (req, res, next) => {
         }
 
         const newComment = new Comment({
-            comment,
-            commentBy: userID
+            comment: comment.current,
+            commentBy: user.user._id
         })
 
         await newComment.save()

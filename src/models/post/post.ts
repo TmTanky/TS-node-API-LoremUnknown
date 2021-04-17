@@ -1,11 +1,12 @@
 import mongoose, {Document, Schema} from 'mongoose'
+import { Icomment } from '../comment/comment'
 
 import { IschemaUser } from '../user/user'
 
 export interface SchemaPost extends Document {
     content: string;
     postedBy: IschemaUser[];
-    comments: IschemaUser[];
+    comments: Icomment[];
     likes: IschemaUser[];
     isHidden: boolean
 }
