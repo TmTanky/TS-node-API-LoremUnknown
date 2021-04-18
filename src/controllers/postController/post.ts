@@ -11,7 +11,10 @@ export const getAllPost: RequestHandler = async (req, res ,next) => {
 
     try {
 
-        const allPost: SchemaPost[] = await Post.find({}).populate('postedBy')
+        const allPost: SchemaPost[] = await Post.find({}).populate('postedBy').populate('comments').populate({
+            path: 'comments',
+            populate: 'commentBy'
+        }).populate('likes')
 
         res.status(200).json({
             status: res.status,
@@ -29,7 +32,8 @@ export const createPost: RequestHandler = async (req, res, next) => {
     try {
 
         const userID = req.params.userID
-        const { content, isHidden } = req.body.createPost as {content: string, isHidden: boolean}
+        const {isHidden} = req.body as {isHidden: boolean}
+        const {content} = req.body.createPost as {content: string}
 
         if (!content || content === "") {
             return next(createError(400, "Content cannot be empty."))
@@ -99,13 +103,28 @@ export const updatePost: RequestHandler = async (req, res, next) => {
     try {
 
         const postID = req.params.postID
-        const {newContent} = req.body as {newContent: string}
+        let {newContent} = req.body as {newContent: string}
 
         if (!isValidObjectId(postID)) {
             return next(createError(400, "Please enter valid postID"))
         }
+        
+        const foundPost = await Post.findOne({_id: postID})
+        
+        if (newContent === "") {
 
-        const foundPost = await Post.findOne({_id : postID})
+            newContent = foundPost?.content!
+
+            await Post.findOneAndUpdate({_id: postID}, {
+                content: newContent
+            })
+
+            return res.status(200).json({
+                status: res.status,
+                msg: "Content Updated."
+            })
+            
+        }
 
         if (foundPost) {
             await Post.findOneAndUpdate({_id: postID}, {

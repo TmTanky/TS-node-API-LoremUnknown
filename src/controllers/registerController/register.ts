@@ -43,7 +43,8 @@ export const registerUser: RequestHandler = async (req, res, next) => {
         const token = sign({id: createUser._id }, process.env.JWT_KEY as string)
 
         return res.status(200).json({
-            createdUser: createUser,
+            status: 200,
+            loggedInUser: createUser,
             token
         })
 
