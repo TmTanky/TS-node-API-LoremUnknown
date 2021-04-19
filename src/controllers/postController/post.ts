@@ -13,7 +13,7 @@ export const getAllPost: RequestHandler = async (req, res ,next) => {
 
         const allPost: SchemaPost[] = await Post.find({}).populate('postedBy').populate('comments').populate({
             path: 'comments',
-            populate: 'commentBy'
+            populate: 'commentBy commentLikes'
         }).populate('likes')
 
         res.status(200).json({
@@ -338,6 +338,47 @@ export const updateCommentPost: RequestHandler = async (req, res, next) => {
         
     } catch (err) {
         next(createError(400, "Please try again."))
+    }
+
+}
+
+export const reactToComment: RequestHandler = async (req, res, next) => {
+
+    try {
+
+        const commentID = req.params.commentID
+        const user: IschemaUser = req.body
+
+        const ifFound = await Comment.findOne({_id: commentID})
+
+        if (ifFound?.commentLikes.includes(user._id)) {
+
+            await Comment.findOneAndUpdate({_id: commentID}, {
+                $pull: {
+                    commentLikes: user._id
+                }
+            })
+
+            return res.status(200).json({
+                msg: 'You unliked this comment.'
+            })
+
+        } else {
+
+            await Comment.findOneAndUpdate({_id: commentID}, {
+                $addToSet: {
+                    commentLikes: user._id
+                }
+            })
+
+            return res.status(200).json({
+                msg: 'You liked this comment.'
+            })
+
+        }
+        
+    } catch (err) {
+        next(createError(400, 'Please try again.'))
     }
 
 }

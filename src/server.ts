@@ -19,6 +19,7 @@ import CommentsRouter from './routes/post/commentPost/commentPost'
 import DeleteCommentRouter from './routes/post/commentPost/deleteCommentPost'
 import UpdateCommentRouter from './routes/post/commentPost/updateCommenPost'
 import GetAllPostRouter from './routes/post/getAllPost/getAllPost'
+import ReactCommentsRouter from './routes/comment/reactToComment'
 
 mongoose.connect(`mongodb+srv://TmAdmin:${process.env.MONGO_PASS}@cluster0.c7khy.mongodb.net/TS-api-unknownlorem?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false })
 
@@ -40,6 +41,7 @@ app.use(CommentsRouter)
 app.use(DeleteCommentRouter)
 app.use(UpdateCommentRouter)
 app.use(GetAllPostRouter)
+app.use(ReactCommentsRouter)
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     next(createError(404, `Not found`))
