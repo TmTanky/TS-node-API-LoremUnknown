@@ -9,6 +9,7 @@ const app = express()
 const PORT = process.env.PORT || 8000
 
 // Routes
+import RootRouter from './routes/welcome/welcome'
 import RegisterRouter from './routes/register/register'
 import LoginRouter from './routes/login/login'
 import CreatePostRouter from './routes/post/createPost/createPost'
@@ -31,6 +32,7 @@ app.use(cookieSession({
     keys: [process.env.KEY_1 as string, process.env.KEY_2 as string]
 }))
 
+app.use(RootRouter)
 app.use(RegisterRouter)
 app.use(LoginRouter)
 app.use(CreatePostRouter)
